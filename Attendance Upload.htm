@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Update</title>
+
+    <!-- XLSX Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid #444;
+        }
+        td, th {
+            padding: 6px 10px;
+            white-space: pre-wrap;
+        }
+
+        /* Hide file input */
+        #file-input {
+            display: none;
+        }
+
+        /* Label as clickable button */
+        #upload-label {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        /* PDF iframe styling */
+        #pdf-preview {
+            margin-top: 20px;
+            width: 100%;
+            height: 1000px;
+            border: 1px solid #444;
+        }
+    </style>
+</head>
+<body>
+
+<label id="upload-label" for="file-input">Click here to upload File</label>
+<input type="file" id="file-input" accept=".xlsx, .xls, .pdf" />
+
+<h2>Attendance Report</h2>
+
+<div id="table-container"></div>
+<iframe id="pdf-preview" style="display:none;"></iframe>
+
+<script>
+    // Load saved file on page load
+    window.onload = function () {
+        const savedFile = localStorage.getItem("uploadedFile");
+        const fileType = localStorage.getItem("uploadedFileType");
+
+        if (savedFile && fileType) {
+            const array = new Uint8Array(JSON.parse(savedFile));
+
+            if (fileType === "excel") {
+                const workbook = XLSX.read(array, { type: "array" });
+                renderWorkbook(workbook);
+            } else if (fileType === "pdf") {
+                displayPDF(array);
+            }
+        }
+    };
+
+    document.getElementById("file-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const data = new Uint8Array(e.target.result);
+
+            if (file.type === "application/pdf") {
+                localStorage.setItem("uploadedFile", JSON.stringify(Array.from(data)));
+                localStorage.setItem("uploadedFileType", "pdf");
+                displayPDF(data);
+            } else {
+                localStorage.setItem("uploadedFile", JSON.stringify(Array.from(data)));
+                localStorage.setItem("uploadedFileType", "excel");
+                const workbook = XLSX.read(data, { type: "array" });
+                renderWorkbook(workbook);
+            }
+        };
+
+        if (file.type === "application/pdf") {
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
+    });
+
+    function renderWorkbook(workbook) {
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        let html = "<table>";
+        rows.forEach(row => {
+            html += "<tr>";
+            row.forEach(cell => {
+                html += `<td>${cell !== undefined ? cell : ""}</td>`;
+            });
+            html += "</tr>";
+        });
+        html += "</table>";
+
+        document.getElementById("table-container").innerHTML = html;
+        document.getElementById("pdf-preview").style.display = "none";
+    }
+
+    function displayPDF(data) {
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        document.getElementById("pdf-preview").src = url;
+        document.getElementById("pdf-preview").style.display = "block";
+        document.getElementById("table-container").innerHTML = "";
+    }
+</script>
+
+</body>
+</html>
