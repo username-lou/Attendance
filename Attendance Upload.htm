@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Excel Upload (Invisible Button)</title>
+
+    <!-- XLSX Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid #444;
+        }
+        td, th {
+            padding: 6px 10px;
+            white-space: pre-wrap;
+        }
+
+        /* Hide file input */
+        #excel-file {
+            display: none;
+        }
+
+        /* Optional: style a label to act as the clickable button */
+        #upload-label {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<label id="upload-label" for="excel-file">Click here to upload File</label>
+    <input type="file" id="excel-file" accept=".xlsx, .xls" />
+    <h2>Attendance Report</h2>
+    <!-- Invisible file input -->
+
+    <!-- Label triggers the hidden file input -->
+    
+
+    <div id="table-container"></div>
+
+    <script>
+
+        // Load saved Excel file on page load
+        window.onload = function () {
+            const savedData = localStorage.getItem("excelData");
+            if (savedData) {
+                const workbook = XLSX.read(JSON.parse(savedData), { type: "array" });
+                renderWorkbook(workbook);
+            }
+        };
+
+        // Upload new file
+        document.getElementById("excel-file").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const data = new Uint8Array(e.target.result);
+
+                // Save to localStorage
+                localStorage.setItem("excelData", JSON.stringify(Array.from(data)));
+
+                const workbook = XLSX.read(data, { type: "array" });
+                renderWorkbook(workbook);
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Render Excel workbook to table
+        function renderWorkbook(workbook) {
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            let html = "<table>";
+            rows.forEach(row => {
+                html += "<tr>";
+                row.forEach(cell => {
+                    html += `<td>${cell !== undefined ? cell : ""}</td>`;
+                });
+                html += "</tr>";
+            });
+            html += "</table>";
+
+            document.getElementById("table-container").innerHTML = html;
+        }
+
+    </script>
+
+</body>
+</html>
