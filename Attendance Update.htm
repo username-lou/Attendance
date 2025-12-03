@@ -39,15 +39,16 @@
             width: 100%;
             height: 1000px;
             border: 1px solid #444;
-        }
+	h1 {
+    text-align: center;
+	}
     </style>
 </head>
 <body>
 
-<label id="upload-label" for="file-input">Click here to upload File</label>
-<input type="file" id="file-input" accept=".xlsx, .xls, .pdf" />
 
-<h2>Attendance Report</h2>
+<h1 text-align:"center";><label id="upload-label" for="file-input" class="upload-text">Attendance Report</label></h>
+<input type="file" id="file-input" accept=".xlsx, .xls, .pdf" />
 
 <div id="table-container"></div>
 <iframe id="pdf-preview" style="display:none;"></iframe>
