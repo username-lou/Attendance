@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Entry Form</title>
+</head>
+<body>
+    <h2>Enter Data</h2>
+    <form id="dataForm">
+        Name: <input type="text" id="name" required><br><br>
+        Age: <input type="number" id="age" required><br><br>
+        Email: <input type="email" id="email" required><br><br>
+        <button type="button" onclick="saveData()">Submit</button>
+    </form>
+
+    <script>
+        // Replace this with your Apps Script Web App URL
+        const SCRIPT_URL = "https://script.google.com/a/macros/pnmac.com/s/AKfycbwAtTIxFFN6YoaAbG0Sdl-AjOjamcQm_O0rN9RwquignOMqHKUW66PlPC3LjDHqx2DI/exec";
+
+        function saveData() {
+            const data = {
+                name: document.getElementById("name").value,
+                age: document.getElementById("age").value,
+                email: document.getElementById("email").value
+            };
+
+            if (!data.name || !data.age || !data.email) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.result === "success") {
+                    alert("Data saved to Google Sheets!");
+                    document.getElementById("dataForm").reset();
+                } else {
+                    alert("Failed: " + res.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error: Unable to save data.");
+            });
+        }
+    </script>
+</body>
+</html>
