@@ -13,16 +13,17 @@
     </form>
 
     <script>
-        // Replace this with your Apps Script Web App URL
-        const SCRIPT_URL = "https://script.google.com/a/macros/pnmac.com/s/AKfycbwAtTIxFFN6YoaAbG0Sdl-AjOjamcQm_O0rN9RwquignOMqHKUW66PlPC3LjDHqx2DI/exec";
+        // Fixed Apps Script Web App URL (standard URL without /a/pnmac.com/)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAtTIxFFN6YoaAbG0Sdl-AjOjamcQm_O0rN9RwquignOMqHKUW66PlPC3LjDHqx2DI/exec";
 
         function saveData() {
             const data = {
-                name: document.getElementById("name").value,
-                age: document.getElementById("age").value,
-                email: document.getElementById("email").value
+                name: document.getElementById("name").value.trim(),
+                age: document.getElementById("age").value.trim(),
+                email: document.getElementById("email").value.trim()
             };
 
+            // Validate inputs
             if (!data.name || !data.age || !data.email) {
                 alert("Please fill in all fields.");
                 return;
@@ -44,7 +45,7 @@
             })
             .catch(err => {
                 console.error(err);
-                alert("Error: Unable to save data.");
+                alert("Error: Unable to save data. Check console for details.");
             });
         }
     </script>
