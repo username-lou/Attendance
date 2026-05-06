@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Auto-Populated Google Form</title>
+  <title>Embedded Auto-Populated Form</title>
   <style>
     body { font-family: Arial; margin: 20px; }
-    input, button { padding: 10px; margin: 5px 0; width: 250px; }
-    label { display: block; margin-top: 10px; }
+    input, button { padding: 10px; margin: 5px 0; width: 200px; }
+    iframe { border: 1px solid #ccc; border-radius: 5px; width: 640px; height: 600px; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2>Enter Your ID to Open Form</h2>
-  <label>ID Number:</label>
-  <input type="text" id="idNumber" placeholder="Enter your ID">
+  <h2>Data Entry Form</h2>
+  <p>Enter your ID number, and the form will auto-fill your info.</p>
 
-  <button onclick="openForm()">Open Form</button>
+  <input type="text" id="idNumber" placeholder="Your ID">
+  <button onclick="updateForm()">Load Form</button>
+
+  <!-- Embedded Google Form -->
+  <iframe id="formIframe" src="about:blank"></iframe>
 
   <script>
-    // Replace this table with your actual data
+    // Lookup table for ID → other info
     const userData = {
       "1001": { firstName: "Alice", lastName: "Smith", department: "HR" },
       "1002": { firstName: "Bob", lastName: "Johnson", department: "IT" },
       "1003": { firstName: "Charlie", lastName: "Lee", department: "Finance" }
     };
 
-    function openForm() {
+    function updateForm() {
       const id = document.getElementById('idNumber').value.trim();
       const data = userData[id];
 
@@ -32,16 +35,21 @@
         return;
       }
 
-      // Your Google Form pre-fill URL
-      // Replace entry IDs with your actual field IDs from the form
-      const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=pp_url` +
-                      `&entry.111111111=${encodeURIComponent(id)}` +
-                      `&entry.222222222=${encodeURIComponent(data.firstName)}` +
-                      `&entry.333333333=${encodeURIComponent(data.lastName)}` +
-                      `&entry.444444444=${encodeURIComponent(data.department)}`;
+      // Encode values for URL
+      const userId = encodeURIComponent(id);
+      const firstName = encodeURIComponent(data.firstName);
+      const lastName = encodeURIComponent(data.lastName);
+      const department = encodeURIComponent(data.department);
 
-      // Open the form in a new tab with pre-filled values
-      window.open(formUrl, "_blank");
+      // Google Form pre-fill URL
+      const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=dialog` +
+                      `&entry.111111111=${userId}` +
+                      `&entry.222222222=${firstName}` +
+                      `&entry.333333333=${lastName}` +
+                      `&entry.444444444=${department}&embedded=true`;
+
+      // Update iframe source
+      document.getElementById('formIframe').src = formUrl;
     }
   </script>
 </body>
