@@ -1,63 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Data Entry Form</title>
+  <title>Auto-Populated Google Form</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     input, button { padding: 10px; margin: 5px 0; width: 250px; }
-    label { display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h2>Data Entry Form</h2>
-
-  <label>ID Number:</label>
-  <input type="text" id="idNumber" placeholder="Enter ID">
-
-  <label>First Name:</label>
-  <input type="text" id="firstName">
-
-  <label>Last Name:</label>
-  <input type="text" id="lastName">
-
-  <label>Department:</label>
-  <input type="text" id="department">
-
-  <button onclick="submitForm()">Submit</button>
+  <h2>Enter ID to Auto-Populate Form</h2>
+  <input type="text" id="idNumber" placeholder="Enter your ID">
+  <button onclick="openForm()">Open Form</button>
 
   <script>
-    // Lookup table for ID -> user details
+    // Example lookup table: ID -> details
     const userData = {
       "1001": { firstName: "Alice", lastName: "Smith", department: "HR" },
       "1002": { firstName: "Bob", lastName: "Johnson", department: "IT" },
       "1003": { firstName: "Charlie", lastName: "Lee", department: "Finance" }
     };
 
-    // Auto-populate fields based on ID
-    document.getElementById('idNumber').addEventListener('input', function() {
-      const id = this.value.trim();
+    function openForm() {
+      const id = document.getElementById('idNumber').value.trim();
       const data = userData[id];
 
-      if (data) {
-        document.getElementById('firstName').value = data.firstName;
-        document.getElementById('lastName').value = data.lastName;
-        document.getElementById('department').value = data.department;
-      } else {
-        // Clear fields if ID not found
-        document.getElementById('firstName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('department').value = '';
+      if (!data) {
+        alert("ID not found!");
+        return;
       }
-    });
 
-    function submitForm() {
-      // For demonstration, just show the data
-      const id = document.getElementById('idNumber').value;
-      const first = document.getElementById('firstName').value;
-      const last = document.getElementById('lastName').value;
-      const dept = document.getElementById('department').value;
+      // Replace these entry IDs with your actual Google Form field IDs
+      const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=pp_url` +
+                      `&entry.111111111=${encodeURIComponent(id)}` +
+                      `&entry.222222222=${encodeURIComponent(data.firstName)}` +
+                      `&entry.333333333=${encodeURIComponent(data.lastName)}` +
+                      `&entry.444444444=${encodeURIComponent(data.department)}`;
 
-      alert(`Submitting:\nID: ${id}\nFirst Name: ${first}\nLast Name: ${last}\nDepartment: ${dept}`);
+      window.open(formUrl, "_blank"); // opens pre-filled form in new tab
     }
   </script>
 </body>
