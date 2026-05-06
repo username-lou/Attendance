@@ -1,55 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Embedded Auto-Populated Form</title>
+  <title>Data Entry Form</title>
   <style>
     body { font-family: Arial; margin: 20px; }
-    input, button { padding: 10px; margin: 5px 0; width: 200px; }
-    iframe { border: 1px solid #ccc; border-radius: 5px; width: 640px; height: 600px; margin-top: 20px; }
+    input, button { padding: 10px; margin: 5px 0; width: 250px; }
+    label { display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
   <h2>Data Entry Form</h2>
-  <p>Enter your ID number, and the form will auto-fill your info.</p>
 
-  <input type="text" id="idNumber" placeholder="Your ID">
-  <button onclick="updateForm()">Load Form</button>
+  <label>ID Number:</label>
+  <input type="text" id="idNumber" placeholder="Enter ID">
 
-  <!-- Embedded Google Form -->
-  <iframe id="formIframe" src="about:blank"></iframe>
+  <label>First Name:</label>
+  <input type="text" id="firstName">
+
+  <label>Last Name:</label>
+  <input type="text" id="lastName">
+
+  <label>Department:</label>
+  <input type="text" id="department">
+
+  <button onclick="submitForm()">Submit</button>
 
   <script>
-    // Lookup table for ID → other info
+    // Lookup table for ID -> user details
     const userData = {
       "1001": { firstName: "Alice", lastName: "Smith", department: "HR" },
       "1002": { firstName: "Bob", lastName: "Johnson", department: "IT" },
       "1003": { firstName: "Charlie", lastName: "Lee", department: "Finance" }
     };
 
-    function updateForm() {
-      const id = document.getElementById('idNumber').value.trim();
+    // Auto-populate fields based on ID
+    document.getElementById('idNumber').addEventListener('input', function() {
+      const id = this.value.trim();
       const data = userData[id];
 
-      if (!data) {
-        alert("ID not found!");
-        return;
+      if (data) {
+        document.getElementById('firstName').value = data.firstName;
+        document.getElementById('lastName').value = data.lastName;
+        document.getElementById('department').value = data.department;
+      } else {
+        // Clear fields if ID not found
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('department').value = '';
       }
+    });
 
-      // Encode values for URL
-      const userId = encodeURIComponent(id);
-      const firstName = encodeURIComponent(data.firstName);
-      const lastName = encodeURIComponent(data.lastName);
-      const department = encodeURIComponent(data.department);
+    function submitForm() {
+      // For demonstration, just show the data
+      const id = document.getElementById('idNumber').value;
+      const first = document.getElementById('firstName').value;
+      const last = document.getElementById('lastName').value;
+      const dept = document.getElementById('department').value;
 
-      // Google Form pre-fill URL
-      const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=dialog` +
-                      `&entry.111111111=${userId}` +
-                      `&entry.222222222=${firstName}` +
-                      `&entry.333333333=${lastName}` +
-                      `&entry.444444444=${department}&embedded=true`;
-
-      // Update iframe source
-      document.getElementById('formIframe').src = formUrl;
+      alert(`Submitting:\nID: ${id}\nFirst Name: ${first}\nLast Name: ${last}\nDepartment: ${dept}`);
     }
   </script>
 </body>
