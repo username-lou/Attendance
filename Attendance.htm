@@ -5,15 +5,18 @@
   <style>
     body { font-family: Arial; margin: 20px; }
     input, button { padding: 10px; margin: 5px 0; width: 250px; }
+    label { display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h2>Enter ID to Auto-Populate Form</h2>
+  <h2>Enter Your ID to Open Form</h2>
+  <label>ID Number:</label>
   <input type="text" id="idNumber" placeholder="Enter your ID">
+
   <button onclick="openForm()">Open Form</button>
 
   <script>
-    // Example lookup table: ID -> details
+    // Replace this table with your actual data
     const userData = {
       "1001": { firstName: "Alice", lastName: "Smith", department: "HR" },
       "1002": { firstName: "Bob", lastName: "Johnson", department: "IT" },
@@ -29,14 +32,16 @@
         return;
       }
 
-      // Replace these entry IDs with your actual Google Form field IDs
+      // Your Google Form pre-fill URL
+      // Replace entry IDs with your actual field IDs from the form
       const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=pp_url` +
                       `&entry.111111111=${encodeURIComponent(id)}` +
                       `&entry.222222222=${encodeURIComponent(data.firstName)}` +
                       `&entry.333333333=${encodeURIComponent(data.lastName)}` +
                       `&entry.444444444=${encodeURIComponent(data.department)}`;
 
-      window.open(formUrl, "_blank"); // opens pre-filled form in new tab
+      // Open the form in a new tab with pre-filled values
+      window.open(formUrl, "_blank");
     }
   </script>
 </body>
