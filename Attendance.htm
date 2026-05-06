@@ -1,21 +1,148 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Data Entry Form</title>
+  <title>Persistent Data Entry Form</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; text-align: center; }
-    iframe { border: 1px solid #ccc; border-radius: 5px; }
+    body { font-family: Arial; margin: 20px; }
+    input, button { padding: 10px; margin: 5px 0; width: 250px; }
+    label { display: block; margin-top: 10px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 90%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   </style>
 </head>
 <body>
-  <h2>Custom Data Entry Form</h2>
-  <p>Fill out the form below. Submissions go directly to Google Sheets.</p>
+  <h2>Data Entry Form (Persistent)</h2>
 
-  <!-- Google Form Embed -->
-  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-MpbY3brwgW78YCsaD3EKPsH96RYyWWSn5w7vIXTaHvyGkg/viewform?usp=dialog" 
-          width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">
-    Loading…
-  </iframe>
+  <label>Employee ID:</label>
+  <input type="text" id="idNumber" placeholder="Enter your ID">
+
+  <label>Full Name:</label>
+  <input type="text" id="fullName" placeholder="Auto-populated">
+
+  <label>Department:</label>
+  <input type="text" id="department" placeholder="Auto-populated">
+
+  <label>Remarks/Reasons (Manual Entry):</label>
+  <input type="text" id="remarks" placeholder="Enter remarks or reasons">
+
+  <button onclick="submitForm()">Submit</button>
+  <button onclick="downloadCSV()">Download CSV</button>
+
+  <table id="dataTable">
+    <tr>
+      <th>ID</th>
+      <th>Full Name</th>
+      <th>Department</th>
+      <th>Remarks/Reasons</th>
+    </tr>
+  </table>
+
+  <script>
+    // Sample auto-fill data
+    const userData = {
+      "510942": { fullName: "Carl Roldan Fernandez", department: "Servicing" },
+      "475400": { fullName: "Gerlie Talastas", department: "Servicing" },
+      "510939": { fullName: "Justine Concepcion", department: "Servicing" },
+	"468830": { fullName: "Christian Austria", department: "Servicing" },
+	"525715": { fullName: "Mark Anthony Padilla", department: "Servicing" },
+	"510937": { fullName: "Leslei Bagos", department: "Servicing" },
+	"510940": { fullName: "MJ Campomanes", department: "Servicing/Default" },
+	"510943": { fullName: "Lougine De Mesa", department: "Servicing" },
+	"525068": { fullName: "Timothy Joseph Parungao", department: "Servicing" },
+	"510936": { fullName: "Raphael Lastimado", department: "Servicing" },
+	"510938": { fullName: "Charmie Genoza", department: "Servicing" },
+	"487595": { fullName: "Mario Agpuldo Jr.", department: "Servicing" },
+	"510941": { fullName: "Mack Jerome Jose", department: "Servicing" },
+	"506239": { fullName: "Arlene Hacutina", department: "Servicing" },
+	"513491": { fullName: "Larry Kalaw", department: "Servicing" },
+	"524007": { fullName: "Michael Sapio", department: "Servicing" },
+    };
+
+    // Load submissions from localStorage if available
+    let submissions = JSON.parse(localStorage.getItem('submissions')) || [];
+
+    const table = document.getElementById('dataTable');
+
+    function renderTable() {
+      // Clear table except headers
+      table.innerHTML = `
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Remarks/Reasons</th>
+        </tr>`;
+      submissions.forEach(s => {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = s.id;
+        row.insertCell(1).innerText = s.fullName;
+        row.insertCell(2).innerText = s.dept;
+        row.insertCell(3).innerText = s.remarks;
+      });
+    }
+
+    renderTable(); // Initial render
+
+    // Auto-populate Full Name and Department when ID is typed
+    document.getElementById('idNumber').addEventListener('input', function() {
+      const id = this.value.trim();
+      const data = userData[id];
+      if (data) {
+        document.getElementById('fullName').value = data.fullName;
+        document.getElementById('department').value = data.department;
+      } else {
+        document.getElementById('fullName').value = '';
+        document.getElementById('department').value = '';
+      }
+    });
+
+    function submitForm() {
+      const id = document.getElementById('idNumber').value.trim();
+      const fullName = document.getElementById('fullName').value.trim();
+      const dept = document.getElementById('department').value.trim();
+      const remarks = document.getElementById('remarks').value.trim();
+
+      if (!id || !fullName || !dept) {
+        alert("Please fill ID, Full Name, and Department.");
+        return;
+      }
+
+      const newEntry = { id, fullName, dept, remarks };
+      submissions.push(newEntry);
+
+      // Save to localStorage
+      localStorage.setItem('submissions', JSON.stringify(submissions));
+
+      renderTable();
+
+      // Clear inputs
+      document.getElementById('idNumber').value = '';
+      document.getElementById('fullName').value = '';
+      document.getElementById('department').value = '';
+      document.getElementById('remarks').value = '';
+    }
+
+    function downloadCSV() {
+      if (submissions.length === 0) {
+        alert("No submissions yet.");
+        return;
+      }
+
+      const csvRows = [
+        ['ID', 'Full Name', 'Department', 'Remarks/Reasons'],
+        ...submissions.map(s => [s.id, s.fullName, s.dept, s.remarks])
+      ];
+
+      const csvContent = csvRows.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'submissions.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
