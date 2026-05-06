@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Persistent Data Entry Form</title>
+  <title>Persistent Data Entry Form with Timestamp</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     input, button { padding: 10px; margin: 5px 0; width: 250px; }
     label { display: block; margin-top: 10px; }
-    table { border-collapse: collapse; margin-top: 20px; width: 90%; }
+    table { border-collapse: collapse; margin-top: 20px; width: 95%; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   </style>
 </head>
 <body>
-  <h2>Data Entry Form (Persistent)</h2>
+  <h2>Data Entry Form (Persistent + Timestamp)</h2>
 
   <label>Employee ID:</label>
   <input type="text" id="idNumber" placeholder="Enter your ID">
@@ -30,6 +30,7 @@
 
   <table id="dataTable">
     <tr>
+      <th>Timestamp</th>
       <th>ID</th>
       <th>Full Name</th>
       <th>Department</th>
@@ -40,9 +41,9 @@
   <script>
     // Sample auto-fill data
     const userData = {
-      "510942": { fullName: "Carl Roldan Fernandez", department: "Servicing" },
-      "475400": { fullName: "Gerlie Talastas", department: "Servicing" },
-      "510939": { fullName: "Justine Concepcion", department: "Servicing" },
+    "510942": { fullName: "Carl Roldan Fernandez", department: "Servicing" },
+    "475400": { fullName: "Gerlie Talastas", department: "Servicing" },
+    "510939": { fullName: "Justine Concepcion", department: "Servicing" },
 	"468830": { fullName: "Christian Austria", department: "Servicing" },
 	"525715": { fullName: "Mark Anthony Padilla", department: "Servicing" },
 	"510937": { fullName: "Leslei Bagos", department: "Servicing" },
@@ -64,9 +65,9 @@
     const table = document.getElementById('dataTable');
 
     function renderTable() {
-      // Clear table except headers
       table.innerHTML = `
         <tr>
+          <th>Timestamp</th>
           <th>ID</th>
           <th>Full Name</th>
           <th>Department</th>
@@ -74,10 +75,11 @@
         </tr>`;
       submissions.forEach(s => {
         const row = table.insertRow();
-        row.insertCell(0).innerText = s.id;
-        row.insertCell(1).innerText = s.fullName;
-        row.insertCell(2).innerText = s.dept;
-        row.insertCell(3).innerText = s.remarks;
+        row.insertCell(0).innerText = s.timestamp;
+        row.insertCell(1).innerText = s.id;
+        row.insertCell(2).innerText = s.fullName;
+        row.insertCell(3).innerText = s.dept;
+        row.insertCell(4).innerText = s.remarks;
       });
     }
 
@@ -107,7 +109,8 @@
         return;
       }
 
-      const newEntry = { id, fullName, dept, remarks };
+      const timestamp = new Date().toLocaleString(); // e.g., 5/6/2026, 11:45:32 AM
+      const newEntry = { timestamp, id, fullName, dept, remarks };
       submissions.push(newEntry);
 
       // Save to localStorage
@@ -129,8 +132,8 @@
       }
 
       const csvRows = [
-        ['ID', 'Full Name', 'Department', 'Remarks/Reasons'],
-        ...submissions.map(s => [s.id, s.fullName, s.dept, s.remarks])
+        ['Timestamp', 'ID', 'Full Name', 'Department', 'Remarks/Reasons'],
+        ...submissions.map(s => [s.timestamp, s.id, s.fullName, s.dept, s.remarks])
       ];
 
       const csvContent = csvRows.map(e => e.join(",")).join("\n");
